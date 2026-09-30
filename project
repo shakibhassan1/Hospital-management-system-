@@ -1,0 +1,388 @@
+set linesize 10000;
+set pagesize 10000;
+
+create table department (
+    department_id number primary key,
+    department_name varchar2(50),
+    department_location varchar2(50),
+    department_openingTime varchar2(20),
+    department_status varchar2(20)
+);
+
+create table doctor (
+    doctor_id number primary key,
+    doctor_name varchar2(50),
+    doctor_phone varchar2(20),
+    doctor_specialization varchar2(50),
+    department_id number,
+    foreign key (department_id) references department(department_id)
+);
+
+create table patient (
+    patient_id number primary key,
+    patient_name varchar2(50),
+    patient_phone varchar2(20),
+    patient_age number,
+    patient_gender varchar2(20),
+    doctor_id number,
+    foreign key (doctor_id) references doctor(doctor_id)
+);
+
+create table appointment (
+    appointment_id number primary key,
+    appointment_date date,
+    appointment_time varchar2(20),
+    patient_id number,
+    doctor_id number,
+    foreign key (patient_id) references patient(patient_id),
+    foreign key (doctor_id) references doctor(doctor_id)
+);
+
+create table medicine (
+    medicine_id number primary key,
+    medicine_name varchar2(50),
+    medicine_price number(10,2),
+    medicine_company varchar2(50),
+    medicine_stock number
+);
+
+create table prescription (
+    prescription_id number primary key,
+    prescription_date date,
+    patient_id number,
+    doctor_id number,
+    medicine_id number,
+    dosage varchar2(50),
+    foreign key (patient_id) references patient(patient_id),
+    foreign key (doctor_id) references doctor(doctor_id),
+    foreign key (medicine_id) references medicine(medicine_id)
+);
+
+create table bill (
+    bill_id number primary key,
+    bill_date date,
+    patient_id number,
+    bill_amount number(10,2),
+    payment_status varchar2(20),
+    foreign key (patient_id) references patient(patient_id)
+);
+
+insert into department values
+(202, 'Cardiology', 'Building A', '8:00 AM - 4:00 PM', 'Open');
+
+insert into department values
+(203, 'Dermatology', 'Building B', '9:00 AM - 5:00 PM', 'Open');
+
+insert into department values
+(204, 'Neurology', 'Building C', '8:30 AM - 4:30 PM', 'Open');
+
+insert into department values
+(205, 'Orthopedics', 'Building D', '9:00 AM - 5:00 PM', 'Closed');
+
+insert into doctor values
+(101, 'Dr. Rahim', '01711111111', 'Cardiology', 202);
+
+insert into doctor values
+(102, 'Dr. Karim', '01822222222', 'Dermatology', 203);
+
+insert into doctor values
+(103, 'Dr. Rafi', '01933333333', 'Neurology', 204);
+
+insert into doctor values
+(104, 'Dr. Hasan', '01644444444', 'Orthopedics', 205);
+
+insert into patient values
+(2023, 'Charlie', '01755555555', 25, 'Male', 101);
+
+insert into patient values
+(2024, 'Sakib', '01866666666', 30, 'Male', 102);
+
+insert into patient values
+(2025, 'Nusrat', '01977777777', 22, 'Female', 103);
+
+insert into patient values
+(2026, 'Tamim', '01688888888', 40, 'Male', 104);
+
+insert into appointment values
+(1001, to_date('2026-09-01','YYYY-MM-DD'), '10:00 AM', 2023, 101);
+
+insert into appointment values
+(1002, to_date('2026-09-02','YYYY-MM-DD'), '11:00 AM', 2024, 102);
+
+insert into appointment values
+(1003, to_date('2026-09-03','YYYY-MM-DD'), '12:00 PM', 2025, 103);
+
+insert into appointment values
+(1004, to_date('2026-09-04','YYYY-MM-DD'), '2:00 PM', 2026, 104);
+
+insert into medicine values
+(1, 'Napa', 20, 'Square', 100);
+
+insert into medicine values
+(2, 'Seclo', 50, 'Square', 80);
+
+insert into medicine values
+(3, 'DP', 80, 'Beximco', 60);
+
+insert into medicine values
+(4, 'Fexo', 120, 'Renata', 50);
+
+insert into prescription values
+(5001, to_date('2026-09-01','YYYY-MM-DD'), 2023, 101, 1, '1+1+1');
+
+insert into prescription values
+(5002, to_date('2026-09-02','YYYY-MM-DD'), 2024, 102, 2, '1+0+1');
+
+insert into prescription values
+(5003, to_date('2026-09-03','YYYY-MM-DD'), 2025, 103, 3, '0+1+1');
+
+insert into prescription values
+(5004, to_date('2026-09-04','YYYY-MM-DD'), 2026, 104, 4, '1+1+0');
+
+insert into bill values
+(6001, to_date('2026-09-01','YYYY-MM-DD'), 2023, 2500, 'Paid');
+
+insert into bill values
+(6002, to_date('2026-09-02','YYYY-MM-DD'), 2024, 1800, 'Paid');
+
+insert into bill values
+(6003, to_date('2026-09-03','YYYY-MM-DD'), 2025, 3200, 'Unpaid');
+
+insert into bill values
+(6004, to_date('2026-09-04','YYYY-MM-DD'), 2026, 2200, 'Paid');
+
+select * from department;
+
+select * from doctor;
+
+select * from patient;
+
+select * from appointment;
+
+select * from medicine;
+
+select * from prescription;
+
+select * from bill;
+
+select 
+    pr.prescription_id,
+    p.patient_name,
+    m.medicine_name,
+    pr.dosage
+from prescription pr
+join patient p
+on pr.patient_id = p.patient_id
+join medicine m
+on pr.medicine_id = m.medicine_id;
+/
+select doctor_name
+from doctor
+where doctor_specialization = 'Cardiology'
+and department_id = 202;
+
+select doctor_name
+from doctor
+union all
+select patient_name
+from patient;
+
+select *
+from department
+where department_name in ('Dermatology', 'Orthopedics');
+
+select *
+from department
+where department_name not in ('Dermatology', 'Orthopedics');
+
+select *
+from patient
+where patient_name like 'C%';
+
+select 
+    d.doctor_name,
+    dp.department_name
+from doctor d
+inner join department dp
+on d.department_id = dp.department_id;
+
+select 
+    d.doctor_name,
+    dp.department_name
+from doctor d
+left join department dp
+on d.department_id = dp.department_id;
+
+select 
+    dp.department_name,
+    d.doctor_name
+from doctor d
+right join department dp
+on d.department_id = dp.department_id;
+
+select 
+    d.doctor_name,
+    dp.department_name
+from doctor d
+full join department dp
+on d.department_id = dp.department_id;
+
+select count(*)
+from patient;
+
+select sum(bill_amount)
+from bill;
+
+select avg(patient_age)
+from patient;
+
+select max(bill_amount)
+from bill;
+
+select min(bill_amount)
+from bill;
+
+select *
+from medicine
+where medicine_price > some (
+    select medicine_price
+    from medicine
+    where upper(medicine_company) = 'SQUARE'
+);
+
+select *
+from medicine
+where medicine_price > all (
+    select medicine_price
+    from medicine
+    where upper(medicine_company) = 'SQUARE'
+);
+
+select patient_name
+from patient p
+where exists (
+    select 1
+    from appointment a
+    where p.patient_id = a.patient_id
+);
+
+select *
+from doctor
+where doctor_name like 'Dr. R%';
+
+select *
+from patient
+where patient_name like '_a%';
+
+set serveroutput on;
+
+declare
+    b_amount bill.bill_amount%type;
+begin
+    select bill_amount
+    into b_amount
+    from bill
+    where bill_id = 6001;
+
+    if b_amount >= 2000 then
+        dbms_output.put_line('High Bill Amount');
+    else
+        dbms_output.put_line('Low Bill Amount');
+    end if;
+end;
+/
+
+declare
+    p1 patient%rowtype;
+begin
+    select *
+    into p1
+    from patient
+    where patient_name = 'Charlie';
+
+    dbms_output.put_line(p1.patient_age);
+end;
+/
+
+begin
+    for i in 1..5 loop
+        dbms_output.put_line(i);
+    end loop;
+end;
+/
+
+declare
+    p_name patient.patient_name%type;
+begin
+    select patient_name
+    into p_name
+    from patient
+    where patient_id = 9999;
+
+    dbms_output.put_line(p_name);
+
+exception
+    when no_data_found then
+        dbms_output.put_line('Patient not found');
+end;
+/
+
+create or replace procedure show_patient
+(
+    p_id number
+)
+is
+    p_name patient.patient_name%type;
+begin
+    select patient_name
+    into p_name
+    from patient
+    where patient_id = p_id;
+
+    dbms_output.put_line(p_name);
+end;
+/
+
+exec show_patient(2023);
+
+create or replace function get_bill
+(
+    b_id number
+)
+return number
+is
+    v_amount number;
+begin
+    select bill_amount
+    into v_amount
+    from bill
+    where bill_id = b_id;
+
+    return v_amount;
+end;
+/
+
+select get_bill(6001)
+from dual;
+
+declare
+    cursor c1 is
+        select patient_name
+        from patient;
+
+    p_name patient.patient_name%type;
+
+begin
+    open c1;
+
+    loop
+        fetch c1 into p_name;
+
+        exit when c1%notfound;
+
+        dbms_output.put_line(p_name);
+    end loop;
+
+    close c1;
+end;
+/
